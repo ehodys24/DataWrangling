@@ -20,6 +20,7 @@ library(ggplot2)
 library(DT)
 library(rsconnect)
 library(corrplot)
+library(shiny)
 ```
 
 ```{r global, include=FALSE}
@@ -39,10 +40,20 @@ Put some text here for the slider
 ```{r}
 # Rate at which to flag high download traffic
 sliderInput("sliderInputVal", "Replace This text:",
-            min = 0, max = 50, value = 3, step = 0.1
+            min = 0, max = 50, value = 5, step = 1.0
 )
-# Maximum number of raw data rows to keep
-numericInput("maxrows", "Recent downloads window:", 50)
+
+EoTR = data.frame(Genres=spotify.raw$playlist_genre, 
+              Subgenres=spotify.raw$playlist_subgenre)
+
+selectInput("genreInput", label = "Genres",
+          choices = c("All", levels(EoTR$Genres)), selected = "All")
+
+# selectInput("subgenreInput", label = "Sub-Genres",
+#           choices = c("All", levels(EoTR$Subgenres)), selected = "All")
+
+# # Maximum number of raw data rows to keep
+# numericInput("maxrows", "Recent downloads window:", 50)
 ```
 
 About 
@@ -173,8 +184,7 @@ box9=boxplot(cordata$tempo, main = "Tempo")
 
 
 
-
-Analytics
+Dashboard
 =======================================================================
 
 row { }
@@ -189,15 +199,32 @@ row { }
 #   top_n(100,track_popularity) %>%
 #   select(track_name, track_artist, track_popularity) %>%
 #   slice(1:10) 
+renderDataTable({
+  spotify.filtered <- spotify.raw
+  
+  if(input$genreInput != 'All')
+  {
+    spotify.filtered <- spotify.raw[ which(spotify.raw$playlist_genre==input$genreInput),]
+    order <-  spotify.filtered %>%
+                group_by(track_id,Song=track_name,Popularity=track_popularity,Artist=track_artist, Genre=playlist_genre,
+                Album=track_album_name, Relase_Date = track_album_release_date)
+  }
+  else
+  {
+    order <-  spotify.filtered %>%
+                  group_by(track_id,Song=track_name,Popularity=track_popularity,Artist=track_artist,
+                  Album=track_album_name, Relase_Date = track_album_release_date)
+  }
 
-order <- spotify.raw %>%
-  group_by(track_id,Song=track_name,Popularity=track_popularity,Artist=track_artist,
-           Album=track_album_name, Relase_Date = track_album_release_date) %>%
+order <-  order %>%
    summarise(n_distinct(10,track_id)) %>%
    arrange(desc(Popularity))  %>%
   top_n(100,Popularity)
-  #select(track_id, count(track_id))
 
+
+
+
+  #select(track_id, count(track_id))
 # ugh <- order %>% 
 #   top_n(10, track_popularity)
 
@@ -207,8 +234,19 @@ order <- spotify.raw %>%
   # select(track_name, track_artist, track_popularity) %>%
   #slice(1:20)  
   #top_n(20,desc(track_popularity))
-renderDataTable({
-DT::datatable(order[1: as.numeric(input$sliderInputVal),2:6])
+
+##Apply the Input Parameters
+
+
+
+ # finalTable <- order[1: as.numeric(input$sliderInputVal),2:6]
+  finalTable <- order[1: as.numeric(input$sliderInputVal),2:7]
+  
+
+  
+  # finalTable <- finalTable %>%
+  #                filter(playlist_genre==genreInput)
+DT::datatable(finalTable)
 })
 ```
 
