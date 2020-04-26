@@ -15,7 +15,7 @@ library(knitr)
 
 ```{r global, include=FALSE}
 # load data in 'global' chunk so it can be shared by all users of the dashboard
-#data <- readr::read_csv("data.csv")
+data.raw <- readr::read_csv("finalproject.data.csv")
 ```
 
 
@@ -39,11 +39,11 @@ numericInput("maxrows", "Recent downloads window:", 50)
 About 
 =======================================================================
 
-Column {data-width=650, data-height=650}
+Column {data-width=160, data-height=1800}
 -----------------------------------------------------------------------
 
-````{r, fig.width=8, fig.height=10}
-include_graphics("TitlePage.png") 
+````{r, fig.width=9, fig.height=10}
+include_graphics("title2.png") 
 ```
 
 
@@ -60,6 +60,8 @@ Column {data-width=650}
 
 ```{r}
 #renderPlot. 
+
+
 ```
 
 Column {data-width=350}
@@ -88,7 +90,7 @@ Column {data-width=650}
 
 
 ```{r}
-#renderPlot. 
+summary(data.raw)
 ```
 
 
