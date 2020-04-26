@@ -3,7 +3,7 @@ title: "BANA 7025 SP20 - Final Project"
 output: 
   flexdashboard::flex_dashboard:
     social: [ "twitter",  "facebook", "linkedin", "github"]
-    orientation: columns
+    orientation: rows
     vertical_layout: fill
     runtime: shiny
 ---
@@ -11,6 +11,12 @@ output:
 ```{r setup, include=FALSE}
 library(flexdashboard)
 library(knitr)
+library(dlookr)
+library(dplyr)
+library(tidyverse) # general utility functions
+library(purrr)
+library(tidyr)
+library(ggplot2)
 ```
 
 ```{r global, include=FALSE}
@@ -48,36 +54,49 @@ include_graphics("title2.png")
 
 
 
+
 Introduction 
 =======================================================================
 
+Row {data-height=200}
+-------------------------------------
 
-Column {data-width=650}
------------------------------------------------------------------------
-
-### Module A
-
-
-```{r}
-#renderPlot. 
-
-
-```
-
-Column {data-width=350}
------------------------------------------------------------------------
-
-### Module B
+### About Spotify
+Founded in 2006, Spotify's primary business is providing an audio streaming platform, the "Spotify" platform, that provides DRM-restricted music, videos and podcasts from record labels and media companies (Wikipedia 2008).  This paper is an exploratory survey of whether musical features and characteristics can be used predict how a song will be both received and classified by Spotify users.  Using different methods for Classification Trees and Clustering in R, we make a case for the feasibility of prediction using a song's meta data stored by Spotify.
 
 ```{r}
-
 ```
 
-### Module C
+Row {data-height=350}
+-------------------------------------
+   
+### Project Abstract
 
-```{r}
+Music can have a powerful effect upon people emotionally and has played an important role in since the first human society.  Thus, being able to classify songs based on their musical features could prove to be a useful tool across many sectors.  While this paper will in no way be an exhaustive survey of the topic it will provide an initial exploratory analysis to help guide future research
+We have chosen to use the "Spotify Song Attributes" data set on Kaggle uploaded by George McIntire under a CC-BY License.  Below is a list of the variables in the dataset with their distributions except for "track id" which is simply a unique identifier for a song (see appendix for details on the dataset). 
 
-```
+We also added information on the biological sex of the performers using lists of popular names split between boy in girl.  We import the data into MS Sql Server to add the correct value for the new variable "isMale" which is a simple bit variable of 0/1 for female/male, respectively.
+
+
+Packages 
+=======================================================================
+
+Row {data-height=200}
+-------------------------------------
+### Project Libraries
+
+</br>
+</br>
+
+- library(flexdashboard)
+- library(knitr)
+- library(dlookr)
+- library(dplyr)
+- library(tidyverse) # general utility functions
+- library(purrr)
+- library(tidyr)
+- library(ggplot2)
+
 
 
 Exploration
@@ -86,11 +105,20 @@ Exploration
 Column {data-width=650}
 -----------------------------------------------------------------------
 
-### Chart A
+### Histogram of Dataset Variables
 
 
 ```{r}
-summary(data.raw)
+#summary(data.raw)
+
+```{r}
+data.raw %>%
+  keep(is.numeric) %>% 
+  gather() %>% 
+  ggplot(aes(value)) +
+  facet_wrap(~ key, scales = "free") +
+  geom_histogram()
+```
 ```
 
 
