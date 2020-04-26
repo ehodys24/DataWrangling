@@ -38,7 +38,7 @@ Put some text here for the slider
 
 ```{r}
 # Rate at which to flag high download traffic
-sliderInput("sliderInputVal", "Warn when rate exceeds:",
+sliderInput("sliderInputVal", "Replace This text:",
             min = 0, max = 50, value = 3, step = 0.1
 )
 # Maximum number of raw data rows to keep
@@ -115,6 +115,12 @@ Row {}
 
 mydata <- spotify.raw[,12:20]
 DT::datatable(mydata )
+#renderDataTable({
+#DT::datatable(order[1: as.numeric(input$sliderInputVal),])
+# mydata <- mydata[1:as.numeric(input$sliderInputVal),]
+  #DT::datatable(mydata )
+#})
+
 ```
 
 
@@ -168,18 +174,95 @@ box9=boxplot(cordata$tempo, main = "Tempo")
 
 
 
-Analytics
+Analytics - 1
 =======================================================================
 
-Column {data-width=650}
+row { }
 -----------------------------------------------------------------------
 
-### Chart A
-
+### MyFirstChart
 
 ```{r}
-#renderPlot. 
+# order <- spotify.raw %>%
+#   #arrange(desc(track_popularity))
+#   group_by(track_name) %>%
+#   top_n(100,track_popularity) %>%
+#   select(track_name, track_artist, track_popularity) %>%
+#   slice(1:10) 
+
+order <- spotify.raw %>%
+  group_by(track_id,Song=track_name,Popularity=track_popularity,Artist=track_artist,
+           Album=track_album_name, Relase_Date = track_album_release_date) %>%
+   summarise(n_distinct(10,track_id)) %>%
+   arrange(desc(Popularity))  %>%
+  top_n(100,Popularity)
+  #select(track_id, count(track_id))
+
+# ugh <- order %>% 
+#   top_n(10, track_popularity)
+
+
+#%>%
+  # top_n(100,track_popularity) %>%
+  # select(track_name, track_artist, track_popularity) %>%
+  #slice(1:20)  
+  #top_n(20,desc(track_popularity))
+renderDataTable({
+DT::datatable(order[1: as.numeric(input$sliderInputVal),2:6])
+})
 ```
+
+
+<!-- ```{r} -->
+<!-- library(dplyr) -->
+<!-- library(reshape) -->
+<!-- library(ggplot2) -->
+<!-- music <- spotify.raw -->
+
+<!-- # Top 5 Songs -->
+<!-- m5 <- music[c(1:5),] -->
+<!-- m5<- m5[, c(2,4,5,9,10,12,13)]  -->
+<!-- m5<- as.data.frame(m5) -->
+<!-- m5.long <- melt(m5, id.vars="track_name") -->
+
+<!-- mp1<- ggplot(data=m5.long, aes(x=variable, y=value))+geom_bar(aes(y=value, fill=track_name),stat="identity", alpha=0.8 , position="dodge")+ ylab("Value")+ xlab("Variables to a song")+coord_flip()+ggtitle("Top 5 songs in Spotify 2017 ") -->
+<!-- mp1 -->
+
+
+<!-- # music$artists <- music$track_artist -->
+<!-- # # Top artists -->
+<!-- # a1 <- group_by(music, artists ) -->
+<!-- # a2 <- dplyr::summarise(a1,  count=n()) -->
+<!-- # a2 <- arrange(a2, desc(count)) -->
+<!-- # a3 <- filter(a2, count>1) -->
+<!-- # a4<- merge (music, a2, x.by=artists) -->
+<!-- # a5 <- group_by(a4, count) -->
+<!-- # a6 <- summarise(a5,  -->
+<!-- #                    adance= mean(danceability), aenergy=mean(energy),  aspeech=mean(speechiness),aacous= mean(acousticness) , alive=mean(liveness) ,avalence=mean(valence)) -->
+<!-- #  -->
+<!-- # # reshape it to the long format -->
+<!-- # a66<- as.data.frame(a6) -->
+<!-- # a66.long <- melt(a66, id.vars="count") -->
+<!-- # a66.long <- a66.long[with(a66.long, order(variable)),] -->
+<!-- #  -->
+<!-- # #circle bar plot -->
+<!-- # mdata1 <- a66.long -->
+<!-- # mdata1$id=seq(1, nrow(mdata1)) -->
+<!-- # mlabel_data1=mdata1 -->
+<!-- # mnumber_of_bar1=nrow(mlabel_data1) -->
+<!-- # angle1m= 90 - 360 * (mlabel_data1$id-0.5) /mnumber_of_bar1  -->
+<!-- # mlabel_data1$hjust<-ifelse( angle1m < -90, 1, 0) -->
+<!-- # mlabel_data1$angle<-ifelse(angle1m < -90, angle1m+180, angle1m) -->
+<!-- #  -->
+<!-- # mp <- ggplot(mdata1, aes(x=as.factor(id), y=value, fill=variable))+geom_bar(stat="identity", alpha=0.8) + ylim(-50,120)+theme_minimal()+theme( -->
+<!-- #     axis.text = element_blank(), -->
+<!-- #     panel.grid = element_blank(), -->
+<!-- #     plot.margin = unit(rep(-1,6), "cm")  ) + -->
+<!-- #   coord_polar()+ -->
+<!-- #   geom_text(data=mlabel_data1, aes(x=id, y=value+10, label=count, hjust=hjust), color="black", fontface="bold",alpha=0.6, size=3, angle= mlabel_data1$angle, inherit.aes = FALSE ) + ggtitle("d")  -->
+<!-- #   -->
+<!-- # mp -->
+<!-- ``` -->
 
 
 Project Summary
