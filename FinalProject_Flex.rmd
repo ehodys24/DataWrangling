@@ -17,11 +17,14 @@ library(tidyverse) # general utility functions
 library(purrr)
 library(tidyr)
 library(ggplot2)
+library(DT)
+library(rsconnect)
+
 ```
 
 ```{r global, include=FALSE}
 # load data in 'global' chunk so it can be shared by all users of the dashboard
-data.raw <- readr::read_csv("finalproject.data.csv")
+spotify.raw <- readr::read_csv("finalproject.data.csv")
 ```
 
 
@@ -98,7 +101,6 @@ Row {data-height=200}
 - library(ggplot2)
 
 
-
 Exploration
 =======================================================================
 
@@ -109,17 +111,16 @@ Column {data-width=650}
 
 
 ```{r}
-#summary(data.raw)
-
-```{r}
-data.raw %>%
+spotify.raw %>%
   keep(is.numeric) %>% 
   gather() %>% 
   ggplot(aes(value)) +
   facet_wrap(~ key, scales = "free") +
-  geom_histogram()
+  geom_histogram(color = "#e9ecef")
 ```
-```
+
+
+
 
 
 
@@ -145,8 +146,26 @@ Column {data-width=650}
 
 ### Chart A
 
-
+- Used Flexdashboard
+- Used Data Input within Flexdashboard
+- Use dplyr techniques from class
+- Deployed to personal shinyapps.io site via rsconnect()
 ```{r}
 #renderPlot. 
 ```
 
+Something
+=======================================================================
+
+Row {}
+-----------------------------------------------------------------------
+
+### Datatable
+</br>
+</br>
+
+```{r}
+
+mydata <- spotify.raw[,12:20]
+DT::datatable(mydata )
+```
