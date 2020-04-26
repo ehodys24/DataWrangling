@@ -1,0 +1,122 @@
+---
+title: "BANA 7025 SP20 - Final Project"
+output: 
+  flexdashboard::flex_dashboard:
+    social: [ "twitter",  "facebook", "linkedin", "github"]
+    orientation: columns
+    vertical_layout: fill
+    runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(knitr)
+```
+
+```{r global, include=FALSE}
+# load data in 'global' chunk so it can be shared by all users of the dashboard
+#data <- readr::read_csv("data.csv")
+```
+
+
+Sidebar {.sidebar}
+=======================================================================
+
+### Adjust the value to update the chart
+
+Put some text here for the slider
+
+
+```{r}
+# Rate at which to flag high download traffic
+sliderInput("sliderInputVal", "Warn when rate exceeds:",
+            min = 0, max = 50, value = 3, step = 0.1
+)
+# Maximum number of raw data rows to keep
+numericInput("maxrows", "Recent downloads window:", 50)
+```
+
+About 
+=======================================================================
+
+Column {data-width=650, data-height=650}
+-----------------------------------------------------------------------
+
+````{r, fig.width=8, fig.height=10}
+include_graphics("TitlePage.png") 
+```
+
+
+
+Introduction 
+=======================================================================
+
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Module A
+
+
+```{r}
+#renderPlot. 
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Module B
+
+```{r}
+
+```
+
+### Module C
+
+```{r}
+
+```
+
+
+Exploration
+=======================================================================
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+
+```{r}
+#renderPlot. 
+```
+
+
+
+Analytics
+=======================================================================
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+
+```{r}
+#renderPlot. 
+```
+
+
+Project Summary
+=======================================================================
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+
+```{r}
+#renderPlot. 
+```
+
