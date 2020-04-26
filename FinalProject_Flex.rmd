@@ -174,7 +174,7 @@ box9=boxplot(cordata$tempo, main = "Tempo")
 
 
 
-Analytics - 1
+Analytics
 =======================================================================
 
 row { }
