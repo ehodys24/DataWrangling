@@ -19,7 +19,7 @@ library(tidyr)
 library(ggplot2)
 library(DT)
 library(rsconnect)
-
+library(corrplot)
 ```
 
 ```{r global, include=FALSE}
@@ -99,6 +99,23 @@ Row {data-height=200}
 - library(purrr)
 - library(tidyr)
 - library(ggplot2)
+- library(corrplot)
+
+Datatable
+=======================================================================
+
+Row {}
+-----------------------------------------------------------------------
+
+### Datatable
+</br>
+</br>
+
+```{r}
+
+mydata <- spotify.raw[,12:20]
+DT::datatable(mydata )
+```
 
 
 Exploration
@@ -119,6 +136,33 @@ spotify.raw %>%
   geom_histogram(color = "#e9ecef")
 ```
 
+
+More Exploration
+=======================================================================
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Histogram of Dataset Variables
+
+
+```{r}
+col=c(4,12:24)
+data <- spotify.raw
+cordata=data[,col]
+datacor=cor(cordata)
+
+corrplot(datacor, type="upper")
+box1=boxplot(cordata$danceability, main= "Danceability")
+box2=boxplot(cordata$energy, main="Energy")
+box3=boxplot(cordata$key, main="Key")        
+box4=boxplot(cordata$loudness, main="Loudness")
+box5=boxplot(cordata$speechiness, main = "Speechiness")
+box6=boxplot(cordata$acousticness, main="Acousticness")
+box7=boxplot(cordata$liveness, main = "Liveness")
+box8=boxplot(cordata$valence, main = "Valence")
+box9=boxplot(cordata$tempo, main = "Tempo")
+```
 
 
 
@@ -148,24 +192,11 @@ Column {data-width=650}
 
 - Used Flexdashboard
 - Used Data Input within Flexdashboard
-- Use dplyr techniques from class
+- Use dplyr techniques from class for creating bins of variables such as danceability and popularity
 - Deployed to personal shinyapps.io site via rsconnect()
+- Deployed code to GitHub for source control and collaboration
+
 ```{r}
 #renderPlot. 
 ```
 
-Something
-=======================================================================
-
-Row {}
------------------------------------------------------------------------
-
-### Datatable
-</br>
-</br>
-
-```{r}
-
-mydata <- spotify.raw[,12:20]
-DT::datatable(mydata )
-```
