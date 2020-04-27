@@ -32,18 +32,18 @@ spotify.raw <- readr::read_csv("finalproject.data.csv")
 Sidebar {.sidebar}
 =======================================================================
 
-### Adjust the value to update the chart
+### Input Controls
 
-Put some text here for the slider
+For use on Dashboard Tabs only
 
 
 ```{r}
-# Rate at which to flag high download traffic
-sliderInput("sliderInputVal", "Replace This text:",
+
+sliderInput("sliderInputVal", "Count:",
             min = 0, max = 50, value = 5, step = 1.0
 )
 
-EoTR = data.frame(Genres=spotify.raw$playlist_genre, 
+EoTR = data.frame(Genres=spotify.raw$playlist_genre,
               Subgenres=spotify.raw$playlist_subgenre)
 
 selectInput("genreInput", label = "Genres",
@@ -56,14 +56,14 @@ selectInput("genreInput", label = "Genres",
 # numericInput("maxrows", "Recent downloads window:", 50)
 ```
 
-About 
+About
 =======================================================================
 
-Column {data-width=160, data-height=1800}
+Row { }
 -----------------------------------------------------------------------
 
 ````{r, fig.width=9, fig.height=10}
-include_graphics("title2.png") 
+include_graphics("TitlePage.png")
 ```
 
 
@@ -72,16 +72,17 @@ include_graphics("title2.png")
 Introduction 
 =======================================================================
 
-Row {data-height=200}
+Row { data-height: 100 }
 -------------------------------------
 
 ### About Spotify
 Founded in 2006, Spotify's primary business is providing an audio streaming platform, the "Spotify" platform, that provides DRM-restricted music, videos and podcasts from record labels and media companies (Wikipedia 2008).  This paper is an exploratory survey of whether musical features and characteristics can be used predict how a song will be both received and classified by Spotify users.  Using different methods for Classification Trees and Clustering in R, we make a case for the feasibility of prediction using a song's meta data stored by Spotify.
 
 ```{r}
+
 ```
 
-Row {data-height=350}
+Row { data-height: 100}
 -------------------------------------
    
 ### Project Abstract
@@ -91,16 +92,14 @@ We have chosen to use the "Spotify Song Attributes" data set on Kaggle uploaded 
 
 We also added information on the biological sex of the performers using lists of popular names split between boy in girl.  We import the data into MS Sql Server to add the correct value for the new variable "isMale" which is a simple bit variable of 0/1 for female/male, respectively.
 
-
 Packages 
 =======================================================================
 
-Row {data-height=200}
+Row { data-height: 200 }
 -------------------------------------
 ### Project Libraries
 
-</br>
-</br>
+
 
 - library(flexdashboard)
 - library(knitr)
@@ -153,7 +152,6 @@ spotify.raw %>%
   geom_histogram(color = "#e9ecef")
 ```
 
-
 More Exploration
 =======================================================================
 
@@ -181,16 +179,73 @@ box8=boxplot(cordata$valence, main = "Valence")
 box9=boxplot(cordata$tempo, main = "Tempo")
 ```
 
-
-
-
-Dashboard
+Dashboard - General
 =======================================================================
 
-row { }
------------------------------------------------------------------------
 
-### MyFirstChart
+Row { }
+-------------------------------------
+   
+### Table of Genre Counts
+
+
+```{r}
+spotify.raw %>% 
+  count(Genre=playlist_genre) %>%
+   knitr::kable()
+```
+    
+### Table of Sub-Genre Counts
+
+```{r}
+spotify.raw %>% 
+  count(Subgenre = playlist_subgenre) %>%
+  slice(1:7) %>%
+   knitr::kable()
+```
+
+### Density
+```{r}
+
+renderPlot({
+    spotify.filtered <- spotify.raw
+feature_names <- names(spotify.raw)[12:23]
+
+  if(input$genreInput != 'All')
+  {
+    spotify.filtered <- spotify.raw[ which(spotify.raw$playlist_genre==input$genreInput),]
+    order <-  spotify.filtered %>%
+                group_by(track_id,Song=track_name,Popularity=track_popularity,Artist=track_artist, Genre=playlist_genre,
+                Album=track_album_name, Relase_Date = track_album_release_date)
+  }
+  else
+  {
+    order <-  spotify.filtered %>%
+                  group_by(track_id,Song=track_name,Popularity=track_popularity,Artist=track_artist,
+                  Album=track_album_name, Relase_Date = track_album_release_date)
+  }
+
+
+
+library(dplyr)
+order %>%
+  select(c('playlist_genre', feature_names)) %>%
+  pivot_longer(cols = feature_names) %>%
+  ggplot(aes(x = value)) +
+  geom_density(aes(color = playlist_genre), alpha = 0.5) +
+  facet_wrap(~name, ncol = 3, scales = 'free') +
+  labs(title = 'Spotify Audio Feature Density - by Genre',
+       x = '', y = 'density') +
+  theme(axis.text.y = element_blank())
+})
+  
+```
+
+
+Row { }
+-------------------------------------
+
+### N Most Popular
 
 ```{r}
 # order <- spotify.raw %>%
@@ -250,74 +305,48 @@ DT::datatable(finalTable)
 })
 ```
 
+Decision Tree
+=======================================================================
+Row {data-width=350}
+-----------------------------------------------------------------------
 
-<!-- ```{r} -->
-<!-- library(dplyr) -->
-<!-- library(reshape) -->
-<!-- library(ggplot2) -->
-<!-- music <- spotify.raw -->
+### CTREE() Analysis
+The output graph below is for the ctree() analysis for "Danceability".  This is for a classification of "highly danceable" being the top 20th percentile of the danceability variable.  These plots are more powerful than those generated with rpart as the decision paths lead to a probability distribution of the classification categories.  'H' is defined as "Highly Danceable".
+	We can see from the graph that the left-most bin indicates a path for a song that is predicted to have 0% danceability.  In contrast, the 3rd distribution from the right shows an approximate 35% chance of such a song being classified as "Highly Danceable" by our metric/feature definition.  Going one step further, we have an approximate 35% chance of producing a "Highly Danceable" song if we give it the characteristics of [a] variance > 0.6, [b] speechiness > .54, [c] loudness <= -5.832
 
-<!-- # Top 5 Songs -->
-<!-- m5 <- music[c(1:5),] -->
-<!-- m5<- m5[, c(2,4,5,9,10,12,13)]  -->
-<!-- m5<- as.data.frame(m5) -->
-<!-- m5.long <- melt(m5, id.vars="track_name") -->
+### Code Snippet
 
-<!-- mp1<- ggplot(data=m5.long, aes(x=variable, y=value))+geom_bar(aes(y=value, fill=track_name),stat="identity", alpha=0.8 , position="dodge")+ ylab("Value")+ xlab("Variables to a song")+coord_flip()+ggtitle("Top 5 songs in Spotify 2017 ") -->
-<!-- mp1 -->
+library(party)
+cut <- .80
+data.tree <- mutate(data.tree, dancebin = factor(case_when(danceability >= cut ~ "H",
+                                                                       #danceability < cut ~ "M",
+                                                                       TRUE                ~ "M")))
 
+fit <- ctree(dancebin ~ energy +  danceability  + loudness + acousticness,    
+             data=data.tree.train)
+print(fit)
+windows(20,20)
+plot(fit, main="Popularity: Cutoff = 80%")
+predictions <- predict(fit, data.tree.test)
 
-<!-- # music$artists <- music$track_artist -->
-<!-- # # Top artists -->
-<!-- # a1 <- group_by(music, artists ) -->
-<!-- # a2 <- dplyr::summarise(a1,  count=n()) -->
-<!-- # a2 <- arrange(a2, desc(count)) -->
-<!-- # a3 <- filter(a2, count>1) -->
-<!-- # a4<- merge (music, a2, x.by=artists) -->
-<!-- # a5 <- group_by(a4, count) -->
-<!-- # a6 <- summarise(a5,  -->
-<!-- #                    adance= mean(danceability), aenergy=mean(energy),  aspeech=mean(speechiness),aacous= mean(acousticness) , alive=mean(liveness) ,avalence=mean(valence)) -->
-<!-- #  -->
-<!-- # # reshape it to the long format -->
-<!-- # a66<- as.data.frame(a6) -->
-<!-- # a66.long <- melt(a66, id.vars="count") -->
-<!-- # a66.long <- a66.long[with(a66.long, order(variable)),] -->
-<!-- #  -->
-<!-- # #circle bar plot -->
-<!-- # mdata1 <- a66.long -->
-<!-- # mdata1$id=seq(1, nrow(mdata1)) -->
-<!-- # mlabel_data1=mdata1 -->
-<!-- # mnumber_of_bar1=nrow(mlabel_data1) -->
-<!-- # angle1m= 90 - 360 * (mlabel_data1$id-0.5) /mnumber_of_bar1  -->
-<!-- # mlabel_data1$hjust<-ifelse( angle1m < -90, 1, 0) -->
-<!-- # mlabel_data1$angle<-ifelse(angle1m < -90, angle1m+180, angle1m) -->
-<!-- #  -->
-<!-- # mp <- ggplot(mdata1, aes(x=as.factor(id), y=value, fill=variable))+geom_bar(stat="identity", alpha=0.8) + ylim(-50,120)+theme_minimal()+theme( -->
-<!-- #     axis.text = element_blank(), -->
-<!-- #     panel.grid = element_blank(), -->
-<!-- #     plot.margin = unit(rep(-1,6), "cm")  ) + -->
-<!-- #   coord_polar()+ -->
-<!-- #   geom_text(data=mlabel_data1, aes(x=id, y=value+10, label=count, hjust=hjust), color="black", fontface="bold",alpha=0.6, size=3, angle= mlabel_data1$angle, inherit.aes = FALSE ) + ggtitle("d")  -->
-<!-- #   -->
-<!-- # mp -->
-<!-- ``` -->
+Row { }
+-----------------------------------------------------------------------
+````{r, fig.width=10, fig.height=10}
+include_graphics("dance_ctree.png")
+```
 
 
 Project Summary
 =======================================================================
 
-Column {data-width=650}
+Row {data-width=350}
 -----------------------------------------------------------------------
 
-### Chart A
+### Summary
 
 - Used Flexdashboard
 - Used Data Input within Flexdashboard
 - Use dplyr techniques from class for creating bins of variables such as danceability and popularity
 - Deployed to personal shinyapps.io site via rsconnect()
 - Deployed code to GitHub for source control and collaboration
-
-```{r}
-#renderPlot. 
-```
-
+- Used Decition tree using ctree() from our Data Mining II Final Project
