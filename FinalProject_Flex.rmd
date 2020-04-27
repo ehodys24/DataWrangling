@@ -90,6 +90,8 @@ Row { data-height: 100}
 Music can have a powerful effect upon people emotionally and has played an important role in since the first human society.  Thus, being able to classify songs based on their musical features could prove to be a useful tool across many sectors.  While this paper will in no way be an exhaustive survey of the topic it will provide an initial exploratory analysis to help guide future research
 We have chosen to use the "Spotify Song Attributes" data set on Kaggle uploaded by George McIntire under a CC-BY License.  Below is a list of the variables in the dataset with their distributions except for "track id" which is simply a unique identifier for a song (see appendix for details on the dataset). 
 
+we found it challenging to tell an interesting store with this dataset so to offset this we made sure to implement this in flexdashboard and deploy to shinyapp.io.  We believed that the "story" was in letting the user explore the dataset themselves using different input parameters on the side nav.  Our hard sell is that the store behind the spotify dataset is a "choose your own adventure" book from elementary school.
+ 
 We also added information on the biological sex of the performers using lists of popular names split between boy in girl.  We import the data into MS Sql Server to add the correct value for the new variable "isMale" which is a simple bit variable of 0/1 for female/male, respectively.
 
 Packages 
